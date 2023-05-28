@@ -1,6 +1,10 @@
 // import { Alchemy, Network } from "alchemy-sdk";
 import type { NextApiRequest as Req, NextApiResponse as Res } from "next";
-import { get12LastBlocks } from "~/utils/alchemyHelpers";
+import {
+  get12LastBlocks,
+  getBlockTxs,
+  getTxDetails,
+} from "~/utils/alchemyHelpers";
 
 const VALID_QUERYS = Object.freeze({
   BLOCKS: "blocks",
@@ -8,13 +12,7 @@ const VALID_QUERYS = Object.freeze({
   RECEIPT: "receipt",
 });
 
-// const settings = {
-//   apiKey: process.env.ALCHEMY_API_KEY,
-//   network: Network.ETH_MAINNET,
-// };
-
-// const alchemy = new Alchemy(settings);
-
+// * handler
 export default async function handler(req: Req, res: Res) {
   if (req.method !== "GET") {
     res.status(400).send("invalid method");
@@ -28,26 +26,26 @@ export default async function handler(req: Req, res: Res) {
     return;
   }
 
-  switch (want) {
+  if (want === VALID_QUERYS.BLOCKS) {
     // Get the 12 last blocks
-    case VALID_QUERYS.BLOCKS:
-      const blocks = await get12LastBlocks();
-      res.status(200).send(blocks);
-      break;
+    const [blockSuccess, blocks] = await get12LastBlocks();
 
+    if (blockSuccess) res.status(200).send(blocks);
+    else res.status(400).send(blocks);
+  } else if (want === VALID_QUERYS.BLOCK_TX) {
     // Get the whole data of X block
-    case VALID_QUERYS.BLOCK_TX:
-      const blockTx = "";
-      res.status(200).send("");
-      break;
+    const [txSuccess, blockTxs] = await getBlockTxs(blockNum);
 
+    if (txSuccess) res.status(200).send(blockTxs);
+    else res.status(400).send(blockTxs);
+  } else if (want === VALID_QUERYS.RECEIPT) {
     // Get details of X transaction
-    case VALID_QUERYS.RECEIPT:
-      const receipt = "";
-      res.status(200).send("");
-      break;
+    const [receiptSuccess, receipt] = await getTxDetails(txHash);
 
-    default:
-      res.status(400).send("invalid query param");
+    if (receiptSuccess) res.status(200).send(receipt);
+    else res.status(400).send(receipt);
+  } else {
+    // silly dev case
+    res.status(400).send("invalid query param");
   }
 }

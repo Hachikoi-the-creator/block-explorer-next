@@ -7,10 +7,7 @@ export default function Document() {
       <Head />
       <body className="bg-blue-100">
         <Navbar />
-        {/* h-7 + pt-3 */}
-        <div className="mt-10">
-          <Main />
-        </div>
+        <Main />
         <NextScript />
       </body>
     </Html>

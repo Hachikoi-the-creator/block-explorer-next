@@ -8,41 +8,46 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 export const get12LastBlocks = async () => {
-  const blockNum = await alchemy.core.getBlockNumber();
+  try {
+    const blockNum = await alchemy.core.getBlockNumber();
 
-  // * make an arr of promises asking for the 12 blocks
-  const promisesArr: Promise<Block>[] = [];
-  for (let i = blockNum - 12; i < blockNum; i++) {
-    const block = alchemy.core.getBlock(blockNum);
-    promisesArr.push(block);
+    // * make an arr of promises asking for the 12 blocks
+    const promisesArr: Promise<Block>[] = [];
+    for (let i = blockNum - 12; i < blockNum; i++) {
+      const block = alchemy.core.getBlock(i);
+      promisesArr.push(block);
+    }
+
+    // * resolve them and send the result
+    const res = await Promise.all(promisesArr);
+    return [true, res];
+  } catch (error) {
+    console.error(error);
+    return [false, "Error trying to get last 12 blocks"];
   }
-
-  // * resolve them and send the result
-  const res = await Promise.all(promisesArr);
-  return res;
 };
 
-export const getBlockTxs = async () => {
-  //
+export const getBlockTxs = async (blockNum: any) => {
+  try {
+    // * if is able to be parsed a number, then is a number (I know +[] = 0, etc)
+    if (isNaN(+blockNum)) throw new Error("Invalid block num");
+    const txs = await alchemy.core.getBlockWithTransactions(+blockNum);
+    return [true, txs];
+  } catch (error) {
+    console.error(error);
+    return [false, "Error trying to get block transactions"];
+  }
 };
 
-export const getTxDetails = async () => {
-  //
+/**
+ * @param {Hex} txHash hash of the tx
+ */
+export const getTxDetails = async (txHash: any) => {
+  try {
+    const txsReceipt = await alchemy.core.getTransactionReceipt(txHash);
+    return [true, txsReceipt];
+  } catch (error) {
+    console.error(error);
+    return [false, "Error trying to get transaction details"];
+  }
 };
-
-async function getBlockNumber() {
-  const blockNum = await alchemy.core.getBlockNumber();
-  // setBlockNumber(blockNum);
-  console.log(blockNum);
-
-  // const duh = await alchemy.core.getBlock(blockNum);
-  // console.log("\nblock?", duh);
-
-  const txs = await alchemy.core.getBlockWithTransactions(blockNum);
-  console.log("\nTsx", txs);
-
-  const txsReceipt = await alchemy.core.getTransactionReceipt(
-    txs.transactions[0].hash
-  );
-  console.log("\nreceipt", txsReceipt);
-}

@@ -1,20 +1,12 @@
-import axios from "axios";
 import BlocksList from "~/components/block/BlocksList";
 import TxList from "~/components/tx/TxList";
 
 function App() {
   return (
-    <section className="">
+    <main className="outline-red-600">
       <BlocksList />
       <TxList />
-      <button
-        onClick={() => {
-          axios("api/alchemy?want=blocks").then((res) => console.log(res));
-        }}
-      >
-        Fetch these
-      </button>
-    </section>
+    </main>
   );
 }
 
