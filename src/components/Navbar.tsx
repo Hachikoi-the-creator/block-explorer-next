@@ -6,7 +6,7 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 h-7">
         <ul className="flex justify-around pt-3">
           <li>
-            <Link href="#">Home</Link>
+            <Link href="/">Home</Link>
           </li>
           <li>
             <Link href="#">Users</Link>

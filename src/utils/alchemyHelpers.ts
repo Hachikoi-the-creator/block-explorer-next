@@ -1,4 +1,4 @@
-import { Alchemy, Block, Network } from "alchemy-sdk";
+import { Alchemy, Block, BlockWithTransactions, Network } from "alchemy-sdk";
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY,
@@ -7,7 +7,9 @@ const settings = {
 
 const alchemy = new Alchemy(settings);
 
-export const get12LastBlocks = async () => {
+type Maybe12Blocks = [boolean, string | Block[]];
+
+export const get12LastBlocks = async (): Promise<Maybe12Blocks> => {
   try {
     const blockNum = await alchemy.core.getBlockNumber();
 
@@ -27,7 +29,9 @@ export const get12LastBlocks = async () => {
   }
 };
 
-export const getBlockTxs = async (blockNum: any) => {
+type MaybeBlock = [boolean, BlockWithTransactions | string];
+
+export const getBlockTxs = async (blockNum: any): Promise<MaybeBlock> => {
   try {
     // * if is able to be parsed a number, then is a number (I know +[] = 0, etc)
     if (isNaN(+blockNum)) throw new Error("Invalid block num");

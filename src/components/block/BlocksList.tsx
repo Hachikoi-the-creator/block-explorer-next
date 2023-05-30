@@ -1,20 +1,24 @@
 import axios from "axios";
-import { BigNumber, Block } from "alchemy-sdk";
+import { BlockWithTransactions } from "alchemy-sdk";
 import { useEffect, useState } from "react";
-import { BlockDetails } from "./BlockDetails";
+import { MinimalBlock } from "./MinimalBlock";
 
 export default function BlocksList() {
-  const [blocksArr, setBlocksArr] = useState<Block[]>([]);
+  const [blocksArr, setBlocksArr] = useState<BlockWithTransactions[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // todo: add try catch
   const fetchData = async () => {
     // setLoading(true);
-    const res = await axios<Block[]>("api/alchemy?want=blocks").catch((e) =>
-      console.error("failed blocks list", (e as Error).message)
-    );
+    const res = await axios<BlockWithTransactions[]>(
+      "api/alchemy?want=blocks"
+    ).catch((e) => console.error("failed blocks list", (e as Error).message));
 
     if (!res) return;
     setBlocksArr(res.data);
+    // const block1 = res.data[0];
+    // console.log(block1);
+
     // setLoading(false);
   };
 
@@ -23,9 +27,9 @@ export default function BlocksList() {
   }, []);
 
   return (
-    <section className="flex flex-wrap">
+    <section className="flex flex-wrap gap-3 w-4/5 mx-[10%]">
       {blocksArr.map((block) => (
-        <BlockDetails {...{ block }} key={block.hash} />
+        <MinimalBlock {...{ block }} key={block.hash} />
       ))}
     </section>
   );

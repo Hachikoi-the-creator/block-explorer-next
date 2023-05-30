@@ -6,10 +6,12 @@ import {
   getTxDetails,
 } from "~/utils/alchemyHelpers";
 
-const VALID_QUERYS = Object.freeze({
+export const VALID_QUERYS = Object.freeze({
   BLOCKS: "blocks",
   BLOCK_TX: "block_tx",
+  BLOCK_TX_PARAM: "blockNum",
   RECEIPT: "receipt",
+  RECEIPT_PARAM: "txHash",
 });
 
 // * handler
