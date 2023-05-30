@@ -8,8 +8,8 @@ import {
 
 export const VALID_QUERYS = Object.freeze({
   BLOCKS: "blocks",
-  BLOCK_TX: "block_tx",
-  BLOCK_TX_PARAM: "blockNum",
+  BLOCK_TX: "blockTx",
+  BLOCK_TX_PARAM: "blockHash",
   RECEIPT: "receipt",
   RECEIPT_PARAM: "txHash",
 });
@@ -22,7 +22,7 @@ export default async function handler(req: Req, res: Res) {
   }
 
   // would be: blocks | block_tx | receipt
-  const { want, blockNum, txHash } = req.query;
+  const { want, blockHash, txHash } = req.query;
   if (typeof want !== "string") {
     res.status(400).send("invalid query param");
     return;
@@ -30,16 +30,16 @@ export default async function handler(req: Req, res: Res) {
 
   if (want === VALID_QUERYS.BLOCKS) {
     // Get the 12 last blocks
-    const [blockSuccess, blocks] = await get12LastBlocks();
+    const { status, data } = await get12LastBlocks();
 
-    if (blockSuccess) res.status(200).send(blocks);
-    else res.status(400).send(blocks);
-  } else if (want === VALID_QUERYS.BLOCK_TX) {
+    if (status) res.status(200).send(data);
+    else res.status(400).send(data);
+  } else if (want === VALID_QUERYS.BLOCK_TX && typeof blockHash === "string") {
     // Get the whole data of X block
-    const [txSuccess, blockTxs] = await getBlockTxs(blockNum);
+    const { status, data } = await getBlockTxs(blockHash);
 
-    if (txSuccess) res.status(200).send(blockTxs);
-    else res.status(400).send(blockTxs);
+    if (status) res.status(200).send(data);
+    else res.status(400).send(data);
   } else if (want === VALID_QUERYS.RECEIPT) {
     // Get details of X transaction
     const [receiptSuccess, receipt] = await getTxDetails(txHash);

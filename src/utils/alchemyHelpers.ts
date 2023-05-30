@@ -1,15 +1,24 @@
-import { Alchemy, Block, BlockWithTransactions, Network } from "alchemy-sdk";
+import {
+  Alchemy,
+  Block,
+  BlockWithTransactions,
+  Network,
+  TransactionReceipt,
+} from "alchemy-sdk";
 
 const settings = {
-  apiKey: process.env.ALCHEMY_API_KEY,
+  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
   network: Network.ETH_MAINNET,
 };
 
 const alchemy = new Alchemy(settings);
 
-type Maybe12Blocks = [boolean, string | Block[]];
+// specify that if ok, data = Block[]
+type MaybeBlocks =
+  | { status: "ok"; data: Block[] }
+  | { status: "error"; data: string };
 
-export const get12LastBlocks = async (): Promise<Maybe12Blocks> => {
+export const get12LastBlocks = async (): Promise<MaybeBlocks> => {
   try {
     const blockNum = await alchemy.core.getBlockNumber();
 
@@ -22,36 +31,43 @@ export const get12LastBlocks = async (): Promise<Maybe12Blocks> => {
 
     // * resolve them and send the result
     const res = await Promise.all(promisesArr);
-    return [true, res];
+    return { status: "ok", data: res };
   } catch (error) {
     console.error(error);
-    return [false, "Error trying to get last 12 blocks"];
+    return { status: "error", data: "Error trying to get last 12 blocks" };
   }
 };
 
-type MaybeBlock = [boolean, BlockWithTransactions | string];
+type MaybeData<T> =
+  | { status: "ok"; data: T }
+  | { status: "error"; data: string };
 
-export const getBlockTxs = async (blockNum: any): Promise<MaybeBlock> => {
+export const getBlockTxs = async (
+  blockHash: string
+): Promise<MaybeData<BlockWithTransactions>> => {
   try {
-    // * if is able to be parsed a number, then is a number (I know +[] = 0, etc)
-    if (isNaN(+blockNum)) throw new Error("Invalid block num");
-    const txs = await alchemy.core.getBlockWithTransactions(+blockNum);
-    return [true, txs];
+    const txs = await alchemy.core.getBlockWithTransactions(blockHash);
+    return { status: "ok", data: txs };
   } catch (error) {
     console.error(error);
-    return [false, "Error trying to get block transactions"];
+    return { status: "error", data: "Error trying to get block transactions" };
   }
 };
 
 /**
  * @param {Hex} txHash hash of the tx
  */
-export const getTxDetails = async (txHash: any) => {
+export const getTxDetails = async (
+  txHash: any
+): Promise<MaybeData<TransactionReceipt>> => {
   try {
     const txsReceipt = await alchemy.core.getTransactionReceipt(txHash);
-    return [true, txsReceipt];
+    if (txsReceipt) {
+      return { status: "ok", data: txsReceipt };
+    }
+    return { status: "error", data: "Couldn't find TX receipt" };
   } catch (error) {
     console.error(error);
-    return [false, "Error trying to get transaction details"];
+    return { status: "error", data: "Error trying to get transaction details" };
   }
 };

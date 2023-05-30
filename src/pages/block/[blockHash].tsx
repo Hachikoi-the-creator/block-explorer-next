@@ -1,20 +1,19 @@
 import { BlockWithTransactions } from "alchemy-sdk";
-import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { VALID_QUERYS } from "../api/alchemy";
 import { getBlockTxs } from "~/utils/alchemyHelpers";
 
 export default function BlockDetails() {
   const [blockData, setblockData] = useState<BlockWithTransactions>();
-  const { nonce } = useRouter().query; // I bet it's not standart... however practical
+  const { blockHash } = useRouter().query; // I bet it's not standart... however practical
 
   const queryBlockData = async () => {
+    // todo change this so make a req to api instead
+    if (typeof blockHash !== "string") return;
     try {
-      const { data } = await axios<BlockWithTransactions>(
-        `api/alchemy?want=block_tx&blockNum=${nonce}`
-      );
+      // even tho I did separated types, doesn't seem to care much...(status)
+      const { data } = await getBlockTxs(blockHash);
 
       if (typeof data !== "string") {
         setblockData(data);
@@ -26,7 +25,7 @@ export default function BlockDetails() {
   };
 
   useEffect(() => {
-    // queryBlockData();
+    queryBlockData();
   }, []);
 
   return (
@@ -35,6 +34,15 @@ export default function BlockDetails() {
         <span>Hash:</span>
         <span>{blockData?.hash}</span>
       </p>
+      <section>
+        {blockData?.transactions.map((tx) => (
+          <p key={tx.hash}>
+            <Link replace href={`tx/${tx.hash}`}>
+              {tx.hash}
+            </Link>
+          </p>
+        ))}
+      </section>
     </main>
   );
 }

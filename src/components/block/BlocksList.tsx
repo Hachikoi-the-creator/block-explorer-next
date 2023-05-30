@@ -1,25 +1,22 @@
-import axios from "axios";
-import { BlockWithTransactions } from "alchemy-sdk";
+import { Block } from "alchemy-sdk";
 import { useEffect, useState } from "react";
 import { MinimalBlock } from "./MinimalBlock";
+import { get12LastBlocks } from "~/utils/alchemyHelpers";
 
 export default function BlocksList() {
-  const [blocksArr, setBlocksArr] = useState<BlockWithTransactions[]>([]);
+  const [blocksArr, setBlocksArr] = useState<Block[]>([]);
   const [loading, setLoading] = useState(false);
 
   // todo: add try catch
+  // todo: change this so make a req to api instead
+  // todo: add loading states
+  // todo: find a way where the status bool is actually usefull in TS
   const fetchData = async () => {
-    // setLoading(true);
-    const res = await axios<BlockWithTransactions[]>(
-      "api/alchemy?want=blocks"
-    ).catch((e) => console.error("failed blocks list", (e as Error).message));
+    const { data } = await get12LastBlocks();
 
-    if (!res) return;
-    setBlocksArr(res.data);
-    // const block1 = res.data[0];
-    // console.log(block1);
-
-    // setLoading(false);
+    if (typeof data !== "string") {
+      setBlocksArr(data);
+    }
   };
 
   useEffect(() => {

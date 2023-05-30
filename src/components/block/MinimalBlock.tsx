@@ -2,7 +2,7 @@ import { Block, BlockWithTransactions } from "alchemy-sdk";
 import Link from "next/link";
 import { getAbreviatedHash, getIntFromHex } from "~/utils/dataHelpers";
 
-type Props = { block: BlockWithTransactions };
+type Props = { block: Block };
 
 export const MinimalBlock = ({ block }: Props) => {
   const percentageOfGasUsed = Math.round(
@@ -11,7 +11,7 @@ export const MinimalBlock = ({ block }: Props) => {
 
   return (
     <Link
-      href={`block/${block.nonce}`}
+      href={`block/${block.hash}`}
       className="border border-red-400 rounded w-[30%]"
     >
       <p className="flex justify-between p-5">
