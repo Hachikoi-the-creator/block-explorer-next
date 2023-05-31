@@ -42,10 +42,10 @@ export default async function handler(req: Req, res: Res) {
     else res.status(400).send(data);
   } else if (want === VALID_QUERYS.RECEIPT) {
     // Get details of X transaction
-    const [receiptSuccess, receipt] = await getTxDetails(txHash);
+    const { status, data } = await getTxDetails(txHash);
 
-    if (receiptSuccess) res.status(200).send(receipt);
-    else res.status(400).send(receipt);
+    if (status === "ok") res.status(200).send(data);
+    else res.status(400).send(data);
   } else {
     // silly dev case
     res.status(400).send("invalid query param");
