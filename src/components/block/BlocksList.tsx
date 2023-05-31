@@ -1,7 +1,7 @@
 import { Block } from "alchemy-sdk";
 import { useEffect, useState } from "react";
 import { MinimalBlock } from "./MinimalBlock";
-import { get12LastBlocks } from "~/utils/alchemyHelpers";
+import { get12LastBlocks, testTx } from "~/utils/alchemyHelpers";
 
 export default function BlocksList() {
   const [blocksArr, setBlocksArr] = useState<Block[]>([]);

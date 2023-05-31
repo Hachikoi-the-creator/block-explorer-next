@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getBlockTxs } from "~/utils/alchemyHelpers";
+import { getAbreviatedHash } from "~/utils/dataHelpers";
 
 export default function BlockDetails() {
   const [blockData, setblockData] = useState<BlockWithTransactions>();
@@ -29,19 +30,24 @@ export default function BlockDetails() {
   }, []);
 
   return (
-    <main>
-      <p>
-        <span>Hash:</span>
-        <span>{blockData?.hash}</span>
-      </p>
+    <main className="w-[80vw] mx-[10vw]">
+      <h1 className="text-center">
+        Block: {getAbreviatedHash(blockData?.hash || "")}
+      </h1>
+
       <section>
-        {blockData?.transactions.map((tx) => (
-          <p key={tx.hash}>
-            <Link replace href={`tx/${tx.hash}`}>
-              {tx.hash}
+        <h2>Transactions</h2>
+        <article className="grid grid-cols-5 gap-7">
+          {blockData?.transactions.map((tx) => (
+            <Link
+              key={tx.hash}
+              href={`/tx/${tx.hash}`}
+              className="bg-red-200 rounded border border-red-500 text-center"
+            >
+              {getAbreviatedHash(tx.hash)}
             </Link>
-          </p>
-        ))}
+          ))}
+        </article>
       </section>
     </main>
   );

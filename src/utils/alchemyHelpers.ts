@@ -71,3 +71,12 @@ export const getTxDetails = async (
     return { status: "error", data: "Error trying to get transaction details" };
   }
 };
+
+export const testTx = async () => {
+  const blocknum = await alchemy.core.getBlockNumber();
+  const block = await alchemy.core.getBlockWithTransactions(blocknum);
+  const tx = await alchemy.core.getTransactionReceipt(
+    block.transactions[0].hash
+  );
+  console.log(tx);
+};

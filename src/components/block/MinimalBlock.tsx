@@ -11,7 +11,7 @@ export const MinimalBlock = ({ block }: Props) => {
 
   return (
     <Link
-      href={`block/${block.hash}`}
+      href={`/block/${block.hash}`}
       className="border border-red-400 rounded w-[30%]"
     >
       <p className="flex justify-between p-5">
