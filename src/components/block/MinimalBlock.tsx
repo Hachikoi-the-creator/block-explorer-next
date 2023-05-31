@@ -1,4 +1,5 @@
-import { Block, BlockWithTransactions } from "alchemy-sdk";
+import { Block } from "alchemy-sdk";
+import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { getAbreviatedHash, getIntFromHex } from "~/utils/dataHelpers";
 
@@ -9,22 +10,39 @@ export const MinimalBlock = ({ block }: Props) => {
     (+getIntFromHex(block.gasUsed) / +getIntFromHex(block.gasLimit)) * 100
   );
 
+  const timeAgo = () => {
+    // Convert the block timestamp to a Date object
+    const blockDate = new Date(block.timestamp * 1000);
+
+    // Get the time difference relative to the current time
+    const timeDifference = formatDistanceToNow(blockDate, {
+      includeSeconds: true,
+      addSuffix: true,
+    });
+    return timeDifference;
+  };
+
   return (
     <Link
       href={`/block/${block.hash}`}
-      className="border border-red-400 rounded w-[30%]"
+      className="border rounded p-4 bg-blue-200 border-blue-700"
     >
-      <p className="flex justify-between p-5">
-        <span>Hash: </span>
+      <p className="mb-2">
+        <strong>Hash: </strong>
         <span>{getAbreviatedHash(block.hash)}</span>
       </p>
-      <p className="flex justify-between p-5">
-        <span>Tx amount: </span>
+      <p className="mb-2">
+        <strong>Tx amount: </strong>
         <span>{block.transactions.length}</span>
       </p>
-      <p className="flex justify-between p-5">
-        <span>Gas used/limit: </span>
+
+      <p className="mb-2">{timeAgo()}</p>
+      <p className="mb-2">
+        <strong>Gas used/limit: </strong>
         <span>{percentageOfGasUsed}%</span>
+      </p>
+      <p>
+        <span>{timeAgo()}</span>
       </p>
     </Link>
   );

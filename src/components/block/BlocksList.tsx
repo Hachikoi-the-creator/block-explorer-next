@@ -24,7 +24,7 @@ export default function BlocksList() {
   }, []);
 
   return (
-    <section className="flex flex-wrap gap-3 w-4/5 mx-[10%]">
+    <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-4/5 mx-[10%]">
       {blocksArr.map((block) => (
         <MinimalBlock {...{ block }} key={block.hash} />
       ))}

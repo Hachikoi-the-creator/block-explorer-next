@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getBlockTxs } from "~/utils/alchemyHelpers";
-import { getAbreviatedHash } from "~/utils/dataHelpers";
+import { getAbreviatedHash, getIntFromHex } from "~/utils/dataHelpers";
 
 export default function BlockDetails() {
   const [blockData, setblockData] = useState<BlockWithTransactions>();
@@ -18,7 +18,6 @@ export default function BlockDetails() {
 
       if (typeof data !== "string") {
         setblockData(data);
-        console.log(data);
       }
     } catch (err) {
       console.error("couldn't get block details", err);
@@ -29,25 +28,73 @@ export default function BlockDetails() {
     queryBlockData();
   }, []);
 
-  return (
-    <main className="w-[80vw] mx-[10vw]">
-      <h1 className="text-center">
-        Block: {getAbreviatedHash(blockData?.hash || "")}
-      </h1>
+  if (!blockData) return <h1>Loading...</h1>;
 
-      <section>
-        <h2>Transactions</h2>
-        <article className="grid grid-cols-5 gap-7">
-          {blockData?.transactions.map((tx) => (
+  return (
+    <main className="p-4 bg-white shadow rounded w[80vw] mx-[10vw]">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <p className="text-gray-500">Hash:</p>
+          <p className="font-medium">{getAbreviatedHash(blockData.hash)}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Parent Hash:</p>
+          <p className="font-medium">
+            {getAbreviatedHash(blockData.parentHash)}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-500">Number:</p>
+          <p className="font-medium">{blockData.number}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Timestamp:</p>
+          <p className="font-medium">{blockData.timestamp}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Nonce:</p>
+          <p className="font-medium">{blockData.nonce}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Difficulty:</p>
+          <p className="font-medium">{blockData.difficulty}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Gas Limit:</p>
+          <p className="font-medium">{getIntFromHex(blockData.gasLimit)}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Gas Used:</p>
+          <p className="font-medium">{getIntFromHex(blockData.gasUsed)}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Miner:</p>
+          <p className="font-medium">{getAbreviatedHash(blockData.miner)}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Extra Data:</p>
+          <p className="font-medium">
+            {getAbreviatedHash(blockData.extraData)}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-500">Transactions:</p>
+          <p className="font-medium">{blockData.transactions.length}</p>
+        </div>
+      </section>
+      <section className="mt-4">
+        <h2 className="text-xl font-bold">Transactions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {blockData.transactions.map((tx) => (
             <Link
               key={tx.hash}
               href={`/tx/${tx.hash}`}
-              className="bg-red-200 rounded border border-red-500 text-center"
+              className="p-4 bg-blue-200 shadow rounded text-violet-900 text-center"
             >
               {getAbreviatedHash(tx.hash)}
             </Link>
           ))}
-        </article>
+        </div>
       </section>
     </main>
   );
